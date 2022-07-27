@@ -1,0 +1,10 @@
+[build]
+target = "x86_64-MysticOS.json"
+
+[target. 'cfg(target_os = "none")']
+runner = "./build.sh"
+
+[unstable]
+build-std-features = ["compiler-builtins-mem"] # To enable memory management tools (which is disabled by default to make sure it does not collide with the C implementations)
+build-std = ["core", "compiler_builtins"] # To build for custom target
+
