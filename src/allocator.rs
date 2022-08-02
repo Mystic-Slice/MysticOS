@@ -1,15 +1,11 @@
+pub mod bump;
+pub mod linked_list;
+pub mod fixed_size_block;
+
 use alloc::alloc::{ GlobalAlloc, Layout };
 use core::ptr::null_mut;
 
 pub struct Dummy;
-
-// #[global_allocator]
-// static ALLOCATOR: Dummy = Dummy;
-
-use linked_list_allocator::LockedHeap;
-
-#[global_allocator]
-static ALLOCATOR: LockedHeap = LockedHeap::empty();
 
 unsafe impl GlobalAlloc for Dummy {
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
@@ -60,3 +56,50 @@ pub fn init_heap(
 
     Ok(())
 }
+
+/// A wrapper around spin::Mutex to permit trait implementations.
+pub struct Locked<A> {
+    inner: spin::Mutex<A>,
+}
+
+impl<A> Locked<A> {
+    pub const fn new(inner: A) -> Self {
+        Locked {
+            inner: spin::Mutex::new(inner),
+        }
+    }
+
+    pub fn lock(&self) -> spin::MutexGuard<A> {
+        self.inner.lock()
+    }
+}
+
+/// Align the given address `addr` upwards to alignment `align`.
+///
+/// Requires that `align` is a power of two.
+fn align_up(addr: usize, align: usize) -> usize {
+    (addr + align - 1) & !(align - 1)
+}
+
+use linked_list_allocator::LockedHeap;
+
+/// Different allocator designs
+// #[global_allocator]
+// static ALLOCATOR: LockedHeap = LockedHeap::empty();
+
+// use linked_list::LinkedListAllocator;
+
+// use bump::BumpAllocator;
+
+// #[global_allocator]
+// static ALLOCATOR: Locked<BumpAllocator> = Locked::new(BumpAllocator::new());
+
+// #[global_allocator]
+// static ALLOCATOR: Locked<LinkedListAllocator> =
+//     Locked::new(LinkedListAllocator::new());
+
+use fixed_size_block::FixedSizeBlockAllocator;
+
+#[global_allocator]
+static ALLOCATOR: Locked<FixedSizeBlockAllocator> = Locked::new(
+    FixedSizeBlockAllocator::new());
