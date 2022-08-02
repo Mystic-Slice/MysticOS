@@ -6,11 +6,22 @@
 #![reexport_test_harness_main = "test_main"]
 
 #![feature(abi_x86_interrupt)]
+#![feature(alloc_error_handler)]
 
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
 pub mod gdt;
+pub mod memory;
+pub mod allocator;
+
+extern crate alloc;
+
+#[cfg(test)]
+use bootloader::{ BootInfo, entry_point };
+
+#[cfg(test)]
+entry_point!(test_kernel_main);
 
 // Have to define a handler
 // for when Rust panics
@@ -44,8 +55,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 }
 
 #[cfg(test)]
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
     init();
     test_main();
     hlt_loop();
@@ -84,4 +94,9 @@ pub fn hlt_loop() -> ! {
     loop {
         x86_64::instructions::hlt();
     }
+}
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> ! {
+    panic!("allocation error: {:?}", layout)
 }

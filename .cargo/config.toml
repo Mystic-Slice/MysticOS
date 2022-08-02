@@ -6,5 +6,5 @@ runner = "bootimage runner"
 
 [unstable]
 build-std-features = ["compiler-builtins-mem"] # To enable memory management tools (which is disabled by default to make sure it does not collide with the C implementations)
-build-std = ["core", "compiler_builtins"] # To build for custom target
+build-std = ["core", "compiler_builtins", "alloc"] # To build for custom target
 
