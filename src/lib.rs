@@ -8,12 +8,15 @@
 #![feature(abi_x86_interrupt)]
 #![feature(alloc_error_handler)]
 
+#![feature(const_mut_refs)]
+
 pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
 pub mod gdt;
 pub mod memory;
 pub mod allocator;
+pub mod task;
 
 extern crate alloc;
 

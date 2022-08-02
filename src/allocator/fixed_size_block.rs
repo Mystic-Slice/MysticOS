@@ -1,5 +1,3 @@
-#![feature(const_mut_refs)]
-
 struct ListNode {
     next: Option<&'static mut ListNode>,
 }

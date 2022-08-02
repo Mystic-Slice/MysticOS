@@ -81,8 +81,6 @@ fn align_up(addr: usize, align: usize) -> usize {
     (addr + align - 1) & !(align - 1)
 }
 
-use linked_list_allocator::LockedHeap;
-
 /// Different allocator designs
 // #[global_allocator]
 // static ALLOCATOR: LockedHeap = LockedHeap::empty();
