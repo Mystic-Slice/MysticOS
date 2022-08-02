@@ -19,12 +19,11 @@ pub extern "C" fn _start() -> ! {
 
     MysticOS::init();
 
-    x86_64::instructions::interrupts::int3();
-
     #[cfg(test)]
     test_main();
 
-    loop {}
+    println!("It did not crash!");
+    MysticOS::hlt_loop();
 }
 
 /// This function is called on panic
@@ -32,7 +31,7 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    MysticOS::hlt_loop();
 }
 
 #[cfg(test)]
